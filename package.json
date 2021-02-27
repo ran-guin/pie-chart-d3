@@ -1,6 +1,6 @@
 {
   "name": "pie-chart-d3",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "tool for generating simple pie charts using d3",
   "author": "Ran Guin <ran.guin@gmail.com>",
   "keywords": [
