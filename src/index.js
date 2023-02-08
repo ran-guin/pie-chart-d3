@@ -9,7 +9,8 @@ function checkDefaults (options) {
 
 function addPie(options) {   
   console.log('add pie chart: ' + JSON.stringify(options))
-  var svg = options.svg || this.initSvg(options)
+  var svg = options.svg || (options.svg = d3Svg.initSvg({clear: true}));
+  
   var data = options.data       // eg [{fname: 'Peter', state: 'BC', age: 41}, {fname: 'Paul', state: 'Alberta', age: 33}, {fname: 'Mary', state: 'Ontario', age: 27}]
 
 
@@ -117,7 +118,10 @@ function addLabels (options) {
     .enter()
     .append('text')
     .style('font-size', set.fontSize + 'px')
+    .style('font-weight', 'bold')
 
+  var bgcolour = 'white'; // CONSTRUCTION - enable svg background specification (?)
+  var bgcolours = data.map((a,i) => bgcolour);   // default to svg background unless labels 'inside'
   if (set.labelPosition === 'outside' ) {
     labels.style('text-anchor', function(d) {
       // are we past the center?
@@ -130,6 +134,7 @@ function addLabels (options) {
     labels.style('text-anchor','middle')
     .attr('transform', d => `translate(${arcLabel.centroid(d)[0] + set.width/2}, ${arcLabel.centroid(d)[1] + set.height/2 + set.fontSize})`)
 
+    bgcolours = set.colours || data.map((a,i) => color(i)); // specify background colours so that text colour may provide contrast
   } else if (set.labelPosition === 'legend') {
     labels.style('text-anchor','start')
     .attr('transform', (d, i) => "translate(" + (labelPos + set.fontSize * 2) + "," + (labelPos + i*set.fontSize*2) + ")")
@@ -149,9 +154,7 @@ function addLabels (options) {
   labels.append('tspan')
     .attr('y', '-0.6em')
     .attr('x', 0)
-    .style('fill', (d,i) => d3Svg.contrastWith(colours[i]))
-    .style('font-weight', 'bold')
-    .style('font-size', set.fontSize + 'px')
+    .style('fill', (d,i) => d3Svg.contrastWith(bgcolours[i]))
     .text((d,i) => `${data[i][set.labelCol]}`)
 
   if (set.labelPosition === 'legend') {
