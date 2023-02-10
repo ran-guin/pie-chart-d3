@@ -38,8 +38,14 @@ function addPie(options) {
 
   var pie = d3.pie()
     .value(function(d) { return d[set.valueCol]; });
-  
-  // canvas.
+
+  var tooltip = svg.append('text')
+          .style('position', 'absolute')
+          .attr("font-size", 20)
+          .attr("x", set.width * 0.9)
+          .attr("y", set.height / 4)
+          .style("visibility", "hidden")
+
   canvas.selectAll("arc")
     .data(pie(data))
     .enter()
@@ -50,25 +56,30 @@ function addPie(options) {
           .attr("fill", (d, i) => colours[i])
           .attr("stroke", set.stroke)
           .attr("stroke-ypos", "1px")
-          .on("mouseenter", function(d) {
-            d3.select(this)
-              .transition()
-              .duration(200)
-              .attr("opacity", 0.5);
-            d3.select('#Legend' + d[set.labelCol]) // NOT WORKING (?)
-              .transition()
-              .duration(200)
-              .attr("opacity", 0.5);
+          .on("mouseover", function (event, d) {
+            d3.select(this).transition().duration(200).attr("opacity", 0.6);
+  
+            var label = d.data[set.labelCol] + ' : ' + d.data[set.valueCol]
+            // var hlabel = '<h1>' + d.data[set.labelCol] + '</h1>'
+  
+            tooltip.transition().duration(200)
+              .style("opacity", .9)
+              .style("visibility", "visible")
+              .text(label)
+            
+            d3.select('#Legend' + d.data[set.labelCol]) // NOT WORKING (?)
+              .style("stroke", 'black')
+              .style("stroke-width", 2)
           })
-          .on("mouseout", function(d) {
-            d3.select(this)
-              .transition()
-              .duration(200)
-              .attr("opacity", 1);
-            d3.select('#Legend' + d[set.labelCol]) // NOT WORKING (?)
-              .transition()
-              .duration(200)
-              .attr("opacity", 1);
+          .on("mouseout", function (event, d) {
+            tooltip.transition().duration(200)
+              .text('tbd')
+              .style("visibility", "hidden")
+  
+              d3.select('#Legend' + d.data[set.labelCol]) // NOT WORKING (?)
+              .style("stroke-width", 0)
+  
+            d3.select(this).transition().duration(200).attr("opacity", 1);
           });
     
   options.radius = radius
